@@ -1,0 +1,169 @@
+Shop ID: 1
+Key: KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+Endpoint URL: https://my.umart.in/Api
+-------------------------------------------------------------------------------------------------
+
+Shop information -> GET
+http://localhost/shop3/api/shopinfo/all/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+-------------------------------------------------------------------------------------------------
+
+
+Search Product -> GET
+http://localhost/shop3/api/products/search/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title&keyword=aloo
+-------------------------------------------------------------------------------------------------
+
+Listing by category pass category UID -> GET
+
+http://localhost/shop3/api/products/category/8207f882-90a5-11eb-8815-18037332e702?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title
+-------------------------------------------------------------------------------------------------
+
+Featured Product List -> GET
+http://localhost/shop3/api/products/featured/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title
+-------------------------------------------------------------------------------------------------
+
+All product listing -> GET
+http://localhost/shop3/api/products/all/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title
+
+page 2 -> GET
+http://localhost/shop3/api/products/all/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title&page=2
+-------------------------------------------------------------------------------------------------
+
+
+Product Details - pass Product ID -> GET
+
+http://localhost/shop3/api/products/detailsbyuid/82045d37-90a5-11eb-8815-18037332e702?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+-------------------------------------------------------------------------------------------------
+
+Mobile No check - POST
+
+http://localhost/shop3/api/actioninfo/mobilecheck?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+Parameter mobile
+
+    "registration": false,
+    "login": true
+
+    if login is true -> just ask for OTP (default is 1234)
+
+    if registration is true -> ask for registration form
+    -----------
+Registration API - POST
+http://localhost/shop3/api/actioninfo/registration?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Paramaters
+mobile, otp, first_name, last_name, emailid, contactperson, address, state, city, pincode, landmark, contactno
+    -----------
+
+Login API - POST
+http://localhost/shop3/api/actioninfo/login?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Paramaters
+mobile, otp
+    -----------
+
+Logout API - POST
+http://localhost/shop3/api/actioninfo/logout?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameter
+session
+-------------------------------------------------------------------------------------------------
+New Order - POST
+http://localhost/shop3/api/actioninfo/orderpost?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session
+cadd_id, address, landmark, state, city, pincode, contactperson, contactno
+couponcode, payment_type, specialinstruction, products - (JSON - pid, qty, price)
+
+-------------------------------------------------------------------------------------------------
+
+Order List - POST
+
+http://localhost/shop3/api/actioninfo/orderlist?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session
+
+-------------------------------------------------------------------------------------------------
+
+Order Details - POST
+
+http://localhost/shop3/api/actioninfo/orderdetails?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session, orderid
+-------------------------------------------------------------------------------------------------
+
+Address List - POST
+
+http://localhost/shop3/api/actioninfo/addresslist?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session
+-------------------------------------------------------------------------------------------------
+
+Address Add - POST
+
+http://localhost/shop3/api/actioninfo/addressadd?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session, contactperson, contactno, address, landmark, state, city, pincode
+-------------------------------------------------------------------------------------------------
+
+Address Delete - POST (after confirmation)
+
+http://localhost/shop3/api/actioninfo/addressdel?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session, id (cadd_id)
+-------------------------------------------------------------------------------------------------
+
+Address Update - POST
+
+http://localhost/shop3/api/actioninfo/addressupdate?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session, contactperson, contactno, address, landmark, state, city, pincode
+-------------------------------------------------------------------------------------------------
+
+Pincode check - POST
+http://localhost/shop3/api/actioninfo/pincheck?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session, pincode
+
+-------------------------------------------------------------------------------------------------
+
+Discount Coupon Check - POST
+http://localhost/shop3/api/actioninfo/couponcheck?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+Parameters
+mobile, session,
+
+----------------------------------------------------------------------
+In banner type ban_type is external
+show the page like About us
+
+if ban_type is category
+  call http://localhost/shop3/api/products/categorydetails
+
+if ban_type is product
+  call http://localhost/shop3/api/products/productsdetails
+
+if ban_type is banner
+  call http://localhost/shop3/api/products/bannerdetails
+
+
+22) Category wise link - POST
+
+http://localhost/shop3/api/products/categorydetails/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+parameter - id
+in this 1~11 in details field of banner
+
+23) Product wise link - POST
+http://localhost/shop3/api/products/productsdetails/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+parameter - id
+
+24) Banner wise link - POST
+http://localhost/shop3/api/products/bannerdetails/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+parameter - id

@@ -67,11 +67,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               _changeIndex(index);
             },
             child: AnimatedContainer(
-              duration: Duration(milliseconds: 150),
+              duration: Duration(milliseconds: 100),
               width: widget.currentIndex == index
-                  ? MediaQuery.of(context).size.width / widget.children.length +
-                      20
-                  : 50,
+                  ? MediaQuery.of(context).size.width * (3 / 8)
+                  : MediaQuery.of(context).size.width * (2 / 8),
               padding: EdgeInsets.only(left: 10, right: 10),
               margin: EdgeInsets.only(top: 5, bottom: 5),
               alignment: Alignment.center,

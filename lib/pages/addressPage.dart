@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:chef_choice/pages/paymentMethodPage.dart';
+import 'package:chef_choice/pages/timeSlotPage.dart';
 import 'package:chef_choice/uiConstants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +49,7 @@ class _AddressPageState extends State<AddressPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    // TODO: implement initSate
     super.initState();
     tec_name = TextEditingController();
     tec_flat = TextEditingController();
@@ -60,6 +62,8 @@ class _AddressPageState extends State<AddressPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title:
+            Text("Select Delivery Address", style: TextStyle(color: primary2)),
         iconTheme: IconThemeData(color: primary2),
         backgroundColor: Colors.white,
       ),
@@ -110,7 +114,10 @@ class _AddressPageState extends State<AddressPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          getButton("Proceed", Icons.arrow_forward_ios, () {}),
+                          getButton("Proceed", Icons.arrow_forward_ios, () {
+                            Navigator.pushNamed(
+                                context, PaymentMethodPage.routeName);
+                          }),
                         ],
                       )
                     ],

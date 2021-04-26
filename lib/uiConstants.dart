@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 
+var inputDeco = InputDecoration(
+  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(10.0),
+  ),
+  enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(10.0),
+    borderSide: BorderSide(
+      color: primaryLight,
+      width: 2.0,
+    ),
+  ),
+);
 var textfield1Deco = InputDecoration(
   contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
   border: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(32.0),
+    borderRadius: BorderRadius.circular(10.0),
   ),
   enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(25.0),
+    borderRadius: BorderRadius.circular(10.0),
     borderSide: BorderSide(
       color: primary2,
       width: 2.0,
@@ -14,16 +27,21 @@ var textfield1Deco = InputDecoration(
   ),
 );
 
-var mainContainerBoxDecor = BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(10),
-    boxShadow: [
-      BoxShadow(
-        blurRadius: 4,
-        color: Colors.grey.withOpacity(0.5),
-        offset: Offset(2, 2),
-      )
-    ]);
+var dropDownDecor = BoxDecoration(
+  border: Border.all(
+    color: primary2,
+    width: 2.0,
+  ),
+  borderRadius: BorderRadius.circular(10.0),
+);
+
+var mainContainerBoxDecor = BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [
+  BoxShadow(
+    blurRadius: 4,
+    color: Colors.grey.withOpacity(0.5),
+    offset: Offset(2, 2),
+  )
+]);
 
 var textStyle1 = TextStyle(fontWeight: FontWeight.bold, color: Colors.black);
 
@@ -58,10 +76,6 @@ Color primaryDark = Color.fromRGBO(141, 161, 159, 1);
 
 */
 
-Color color1 = Color.fromRGBO(0, 0, 0, 1);
-Color primary = Color.fromRGBO(255, 202, 66, 1);
-Color primary1 = Color.fromRGBO(250, 118, 108, 1);
-Color primary2 = Color.fromRGBO(206, 100, 142, 1);
-
-Color primaryLight = Color.fromRGBO(255, 168, 203, 1);
+Color primary2 = Color.fromRGBO(206, 100, 142, 1); //most used color, Used as primary color
+Color primaryLight = Color.fromRGBO(255, 168, 203, 1); //Used as primaryAccent color
 Color primaryDark = Color.fromRGBO(82, 0, 33, 1);

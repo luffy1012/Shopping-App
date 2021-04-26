@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:chef_choice/uiConstants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,28 +16,33 @@ class CategoryTile extends StatelessWidget {
     var width = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          child: Stack(
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border.all(color: primary2.withOpacity(0.2), width: 2),
+            borderRadius: BorderRadius.all(Radius.circular(8))),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
             children: [
-              Image.asset(imgPath),
-              Opacity(
-                opacity: 0.45,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-              Center(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30),
+              Expanded(flex: 2, child: Image.network(imgPath)),
+              Expanded(
+                flex: 1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: primary2,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               )
             ],
