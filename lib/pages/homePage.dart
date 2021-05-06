@@ -24,75 +24,6 @@ class _HomePageState extends State<HomePage> {
   SearchBar searchBar;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-/*  List products = [
-    {
-      'title': 'Eggs',
-      'img': 'images/food/egg_compressed.jpg',
-      'price': 5.0,
-      'id': 'Eggs1',
-      'mul_img': [
-        'images/food/egg.jpg',
-        'images/food/egg.jpg',
-        'images/food/egg.jpg',
-      ]
-    },
-    {
-      'title': 'Chicken',
-      'img': 'images/food/chicken_compressed.jpg',
-      'price': 150.0,
-      'id': 'Chicken1',
-      'mul_img': [
-        'images/food/chicken.jpg',
-        'images/food/chicken.jpg',
-        'images/food/chicken.jpg',
-      ]
-    },
-    {
-      'title': 'Eggs',
-      'img': 'images/food/egg_compressed.jpg',
-      'price': 5.0,
-      'id': 'Eggs1',
-      'mul_img': [
-        'images/food/egg.jpg',
-        'images/food/egg.jpg',
-        'images/food/egg.jpg',
-      ]
-    },
-    {
-      'title': 'Chicken',
-      'img': 'images/food/chicken_compressed.jpg',
-      'price': 150.0,
-      'id': 'Chicken1',
-      'mul_img': [
-        'images/food/chicken.jpg',
-        'images/food/chicken.jpg',
-        'images/food/chicken.jpg',
-      ]
-    },
-    {
-      'title': 'Eggs',
-      'img': 'images/food/egg_compressed.jpg',
-      'price': 5.0,
-      'id': 'Eggs1',
-      'mul_img': [
-        'images/food/egg.jpg',
-        'images/food/egg.jpg',
-        'images/food/egg.jpg',
-      ]
-    },
-    {
-      'title': 'Chicken',
-      'img': 'images/food/chicken_compressed.jpg',
-      'price': 150.0,
-      'id': 'Chicken1',
-      'mul_img': [
-        'images/food/chicken.jpg',
-        'images/food/chicken.jpg',
-        'images/food/chicken.jpg',
-      ]
-    },
-  ];*/
-
   List<Widget> _tabs;
   void updateTabIndex(int i) {
     setState(() {
@@ -108,7 +39,7 @@ class _HomePageState extends State<HomePage> {
             right: 60,
           ),
           child: Image.asset(
-            "images/logo_text.png",
+            "images/long_logo.png",
             fit: BoxFit.fill,
           ),
         ),
@@ -183,7 +114,7 @@ class _HomePageState extends State<HomePage> {
     //Provider.of<ShopDataProvider>(context).getShopDetails();
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Color.fromRGBO(236, 236, 236, 1),
+      backgroundColor: Color.fromRGBO(245, 245, 245, 1),
       appBar: searchBar.build(context),
       body: _tabs[_selectedTabIndex],
       bottomNavigationBar: CustomBottomNavigationBar(

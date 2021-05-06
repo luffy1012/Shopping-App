@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ShopDataProvider with ChangeNotifier {
   final shopID = 1;
@@ -56,7 +57,7 @@ class ShopDataProvider with ChangeNotifier {
         final productsData = jsonRes['data'];
         _productLists.clear();
         productsData.forEach((element) {
-          _productLists.add(ProductList(element['p_uid'], element['title'], element['price'], element['product_image']));
+          _productLists.add(ProductList(element['product_id'], element['p_uid'], element['title'], element['price'], element['product_image']));
         });
         return _productLists;
       } else {
@@ -65,7 +66,7 @@ class ShopDataProvider with ChangeNotifier {
       }
     } catch (e) {
       print("## shopDataProvider.dart : getProductsByCategory(String category_id) : ${e.toString()}");
-      return [ProductList("error", "error", "error", "error")];
+      return [ProductList("error", "error", "error", "error", "error")];
     }
   }
 
@@ -78,7 +79,7 @@ class ShopDataProvider with ChangeNotifier {
         final productsData = jsonRes['data'];
         _productLists.clear();
         productsData.forEach((element) {
-          _productLists.add(ProductList(element['p_uid'], element['title'], element['price'], element['product_image']));
+          _productLists.add(ProductList(element['product_id'], element['p_uid'], element['title'], element['price'], element['product_image']));
         });
         return _productLists;
       } else {
@@ -87,7 +88,27 @@ class ShopDataProvider with ChangeNotifier {
       }
     } catch (e) {
       print("## shopDataProvider.dart : getProductsBySearch(String keyword) : ${e.toString()}");
-      return [ProductList("error", "error", "error", "error")];
+      return [ProductList("error", "error", "error", "error", "error")];
+    }
+  }
+
+  Future<List<ProductList>> getMultipleProductsById(List<String> ids) async {
+    try {
+      var url;
+      var response;
+      var jsonRes;
+      _productLists.clear();
+      for (int i = 0; i < ids.length; i++) {
+        url = "https://my.umart.in/Api/products/detailsbyuid/${ids[i]}?shopID=$shopID&key=$apiKey";
+        response = await http.get(Uri.parse(url));
+        jsonRes = json.decode(response.body) as Map;
+
+        _productLists.add(ProductList(jsonRes['product_id'], ids[i], jsonRes['title'], jsonRes['price'], jsonRes['product_image']));
+      }
+      return _productLists;
+    } catch (e) {
+      print("## shopDataProvider.dart : getMultipleProductsById(List<String> ids) : ${e.toString()}");
+      return [ProductList("error", "error", "error", "error", "error")];
     }
   }
 
@@ -102,8 +123,8 @@ class ShopDataProvider with ChangeNotifier {
         jsonRes['gallery'].forEach((element) {
           _productImgList.add(element['filename']);
         });
-        _product = Product(productId, jsonRes['title'], jsonRes['description'], jsonRes['price'], jsonRes['old_price'], int.parse(jsonRes['qty_res']),
-            jsonRes['catname'], _productImgList);
+        _product = Product(jsonRes['product_id'], productId, jsonRes['title'], jsonRes['description'], jsonRes['price'], jsonRes['old_price'],
+            int.parse(jsonRes['qty_res']), jsonRes['catname'], _productImgList);
         return _product;
       } else {
         print("## shopDataProvider.dart : getProductDetails(String product_id) : ${jsonRes['message']}");
@@ -111,7 +132,7 @@ class ShopDataProvider with ChangeNotifier {
       }
     } catch (e) {
       print("## shopDataProvider.dart : getProductDetails(String product_id) : ${e.toString()}");
-      return Product("error", "error", "error", "error", "error", 0, "error", ["error"]);
+      return Product("", "error", "error", "error", "error", "error", 0, "error", ["error"]);
     }
   }
 
@@ -135,7 +156,8 @@ class ShopDataProvider with ChangeNotifier {
           var data = jsonRes["data"];
           _bannerProductLists.clear();
           data.forEach((element) {
-            _bannerProductLists.add(ProductList(element['p_uid'], element['title'], element['price'], element['product_image']));
+            _bannerProductLists
+                .add(ProductList(element['product_id'], element['p_uid'], element['title'], element['price'], element['product_image']));
           });
           return _bannerProductLists;
         } else {
@@ -166,6 +188,10 @@ class ShopDataProvider with ChangeNotifier {
           // print("Store page data");
           var pages = jsonRes['data']['pages'];
           await SharedPrefProvider().storePageData(pages);
+
+          var shopDetails = jsonRes['data']['general'];
+          await SharedPrefProvider().storeShopData(shopDetails);
+
           // print("Pages stored");
           // print("Not again!");
           try {
@@ -182,7 +208,8 @@ class ShopDataProvider with ChangeNotifier {
           final productsData = jsonRes['data']['products'];
           _featuredProductLists.clear();
           productsData.forEach((element) {
-            _featuredProductLists.add(ProductList(element['p_uid'], element['title'], element['price'], element['product_image']));
+            _featuredProductLists
+                .add(ProductList(element['product_id'], element['p_uid'], element['title'], element['price'], element['product_image']));
           });
 
           final bannerData = jsonRes['data']['banner'];
@@ -202,7 +229,7 @@ class ShopDataProvider with ChangeNotifier {
       print("## shopDataProvider.dart : getShopDetails() : ${e.toString()}");
       Map<String, dynamic> data = {
         'categories': [Category("error", "error", "error", "error", "error", "error")],
-        'featuredProducts': [ProductList("error", "error" "error", "error", "error")],
+        'featuredProducts': [ProductList("error", "error", "error" "error", "error", "error")],
         'banners': [MyBanner("error", "error", "error", "error", "error", "error")]
       };
       return data;
@@ -303,7 +330,7 @@ class ShopDataProvider with ChangeNotifier {
         data.forEach((state) {
           _stateList.add(state['statename']);
         });
-        print(_stateList);
+        //print(_stateList);
         return _stateList;
       } else {
         throw jsonRes['message'];
@@ -313,6 +340,205 @@ class ShopDataProvider with ChangeNotifier {
       _stateList.clear();
       _stateList.add("Maharashtra");
       return _stateList;
+    }
+  }
+
+  //---------------------------------------------------------------------------------------
+  //All methods from here is used to process and place orders!
+  Future getDeliveryDetails(String date, String products) async {
+    try {
+      print("date in method $date");
+      //print(products);
+      final url = "https://my.umart.in/Api/actioninfo/delivery/?shopID=$shopID&key=$apiKey";
+      final response = await http.post(Uri.parse(url), body: {'date': date, 'products': products});
+      final jsonRes = json.decode(response.body) as Map;
+      if (jsonRes['status'] == true) {
+        print(jsonRes['data'].runtimeType);
+
+        SharedPrefProvider spf = SharedPrefProvider();
+        bool isStored = await spf.storeDeliveryDetails(jsonRes['data']);
+        if (isStored)
+          return jsonRes;
+        else
+          throw "Delivery related data not stored. (ShopDataProvider.dart #339)";
+      } else {
+        throw jsonRes['message'];
+      }
+    } catch (e) {
+      print("## shopDataProvider.dart : getSchedule(String date, String products) : ${e.toString()}");
+    }
+  }
+
+  Future<List> getAddressList() async {
+    try {
+      SharedPreferences shr = await SharedPreferences.getInstance();
+      String session = shr.getString("session");
+      String mobile = shr.getString("mobile");
+
+      // print(session);
+      // print(mobile);
+      final url = "https://my.umart.in/Api/actioninfo/addresslist?shopID=$shopID&key=$apiKey";
+      final response = await http.post(Uri.parse(url), body: {'mobile': mobile, 'session': session});
+      final jsonRes = json.decode(response.body) as Map;
+      //print(jsonRes);
+      if (jsonRes['status'] == true) {
+        return jsonRes['data'];
+      } else {
+        throw jsonRes['message'];
+      }
+    } catch (e) {
+      print("## shopDataProvider.dart : getAddressList() : ${e.toString()}");
+      return [];
+    }
+  }
+
+  Future<String> addNewAddress(
+      String address, String landmark, String city, String state, String pincode, String contactperson, String contactno) async {
+    try {
+      SharedPreferences shr = await SharedPreferences.getInstance();
+      String session = shr.getString("session");
+      String mobile = shr.getString("mobile");
+
+      final url = "https://my.umart.in/Api/actioninfo/addressadd?shopID=$shopID&key=$apiKey";
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'mobile': mobile,
+          'session': session,
+          'address': address,
+          'landmark': landmark,
+          'city': city,
+          'state': state,
+          'pincode': pincode,
+          'contactperson': contactperson,
+          'contactno': contactno
+        },
+      );
+      final jsonRes = json.decode(response.body) as Map;
+      if (jsonRes['status'] == true) {
+        return "${jsonRes['data']['id']}";
+      } else {
+        throw jsonRes['message'];
+      }
+    } catch (e) {
+      print("## shopDataProvider.dart : addNewAddress() : ${e.toString()}");
+      return null;
+    }
+  }
+
+  Future<bool> deleteAddress(String id) async {
+    try {
+      SharedPreferences shr = await SharedPreferences.getInstance();
+      String session = shr.getString("session");
+      String mobile = shr.getString("mobile");
+      final url = "https://my.umart.in/Api/actioninfo/addressdel?shopID=$shopID&key=$apiKey";
+      final response = await http.post(
+        Uri.parse(url),
+        body: {'id': id, 'mobile': mobile, 'session': session},
+      );
+      final jsonRes = json.decode(response.body) as Map;
+      if (jsonRes['status'] == true)
+        return true;
+      else
+        throw jsonRes['message'];
+    } catch (e) {
+      print("## shopDataProvider.dart : deleteAddress(String id) : ${e.toString()}");
+      return false;
+    }
+  }
+
+  Future<Map> placeOrder({
+    @required String mobile,
+    @required String session,
+    @required String cadd_id,
+    @required String address,
+    @required String landmark,
+    @required String city,
+    @required String state,
+    @required String pincode,
+    @required String contactperson,
+    @required String cotanctno,
+    @required String couponcode,
+    @required String payment_type,
+    @required String specialinstruction,
+    @required String products,
+    @required String book_date,
+    @required String timing,
+  }) async {
+    try {
+      final url = "https://my.umart.in/Api/actioninfo/orderpost?shopID=$shopID&key=$apiKey";
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'mobile': mobile,
+          'session': session,
+          'cadd_id': cadd_id,
+          'address': address,
+          'landmark': landmark,
+          'city': city,
+          'state': state,
+          'pincode': pincode,
+          'contactperson': contactperson,
+          'contactno': cotanctno,
+          'couponcode': couponcode,
+          'payment_type': payment_type,
+          'specialinstruction': specialinstruction,
+          'products': products,
+          'book_date': book_date,
+          'timing': timing,
+        },
+      );
+      final jsonRes = await json.decode(response.body) as Map;
+      print(payment_type);
+      if (jsonRes['status'] == true) {
+        return jsonRes;
+      } else {
+        throw jsonRes['message'];
+      }
+    } catch (e) {
+      print("## shopDataProvider.dart : placeOrder() : ${e.toString()}");
+      return {"status": false, "message": e.toString()};
+    }
+  }
+
+  Future getOrderList() async {
+    try {
+      SharedPreferences shr = await SharedPreferences.getInstance();
+      String mobile = shr.getString("mobile");
+      String session = shr.getString("session");
+
+      final url = "https://my.umart.in/Api/actioninfo/orderlist?shopID=$shopID&key=$apiKey";
+      final response = await http.post(Uri.parse(url), body: {'mobile': mobile, 'session': session});
+      final jsonRes = json.decode(response.body) as Map;
+      //print(jsonRes);
+      if (jsonRes['status'])
+        return jsonRes;
+      else
+        throw jsonRes['message'];
+    } catch (e) {
+      print("## shopDataProvider.dart : getOrderList() : ${e.toString()}");
+      return e.toString();
+    }
+  }
+
+  Future getOrderDetails(String oid) async {
+    try {
+      SharedPreferences shr = await SharedPreferences.getInstance();
+      String mobile = shr.getString("mobile");
+      String session = shr.getString("session");
+
+      final url = "https://my.umart.in/Api/actioninfo/orderdetails?shopID=$shopID&key=$apiKey";
+      final response = await http.post(Uri.parse(url), body: {'mobile': mobile, 'session': session, 'orderid': oid});
+
+      final jsonRes = json.decode(response.body) as Map;
+
+      if (jsonRes['status'])
+        return jsonRes;
+      else
+        throw jsonRes['message'];
+    } catch (e) {
+      print("## shopDataProvider.dart : getOrderDetails(String oid) : ${e.toString()}");
+      return e.toString();
     }
   }
 }
@@ -337,14 +563,17 @@ class Area {
 
 //Use this class when you receive list of products from API, like products by category or by search
 class ProductList {
+  final p_id;
   final String product_id;
   final String product_title;
   final String product_price;
   final String product_img_url;
-  ProductList(this.product_id, this.product_title, this.product_price, this.product_img_url);
+  ProductList(this.p_id, this.product_id, this.product_title, this.product_price, this.product_img_url);
 }
 
 class Product {
+  final p_id;
+
   final String product_id;
   final String title;
   final String desc;
@@ -354,7 +583,7 @@ class Product {
   final String category;
   final List imgUrls;
 
-  Product(this.product_id, this.title, this.desc, this.price, this.oldPrice, this.qty_res, this.category, this.imgUrls);
+  Product(this.p_id, this.product_id, this.title, this.desc, this.price, this.oldPrice, this.qty_res, this.category, this.imgUrls);
 }
 
 class MyBanner {

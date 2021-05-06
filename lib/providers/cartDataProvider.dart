@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -12,6 +13,8 @@ class CartDataProvider with ChangeNotifier {
 
   static final _tableName = "myTable";
   static final _colProductId = "product_id";
+  static final _colPid = "pid";
+
   static final _colProductName = "product_name";
   static final _colPrice = "product_price";
   static final _colQty = "qty";
@@ -19,6 +22,8 @@ class CartDataProvider with ChangeNotifier {
   static final _colImgUrl = "img_url";
 
   static get colProductId => _colProductId;
+
+  static get colPid => _colPid;
 
   static get colProductName => _colProductName;
 
@@ -58,6 +63,7 @@ class CartDataProvider with ChangeNotifier {
     try {
       String query = '''
     CREATE TABLE $_tableName(
+      $_colPid Text NOT NULL,
       $_colProductId TEXT PRIMARY KEY,
       $_colProductName TEXT NOT NULL,
       $_colPrice REAL NOT NULL,
@@ -84,10 +90,23 @@ class CartDataProvider with ChangeNotifier {
       Database db = await instance.database;
       print("Insert");
       var data = await db.insert(_tableName, row);
-
+      print("INSERTED $data");
       return data;
     } catch (e) {
       print("MESSAGE : ${e.toString()}");
+    }
+  }
+
+  Future<int> getNumberOfProducts() async {
+    try {
+      Database db = await instance.database;
+      var data = await db.rawQuery("SELECT COUNT (*) FROM $_tableName");
+      int count = Sqflite.firstIntValue(data);
+
+      return count;
+    } catch (e) {
+      print(e.toString());
+      return 0;
     }
   }
 
@@ -113,28 +132,53 @@ class CartDataProvider with ChangeNotifier {
     }
   }
 
-  Future<Map> getAllProductsIdQty() async {
-    Map<String, int> map = {};
-    try {
-      var data = await getAllProducts();
-      // print(data.runtimeType);
-      // print(data);
-      data.forEach((element) {
-        map[element['product_id']] = element["qty"];
-      });
-      print(map);
-      return map;
-    } catch (e) {
-      print(e.toString());
-      return map;
-    }
-  }
-
   Future removeProduct(String productID) async {
     try {
       Database db = await instance.database;
       var res = db.delete(_tableName, where: '$_colProductId = ?', whereArgs: [productID]);
-    } catch (e) {}
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<List> isProductExist(String productID) async {
+    var result;
+    try {
+      // Database db = await instance.database;
+      result = await getRowByID(productID);
+      return result;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  Future<int> truncateTable() async {
+    try {
+      Database db = await instance.database;
+      int result = await db.delete(_tableName);
+      return result;
+    } catch (e) {
+      print(e.toString());
+      return 0;
+    }
+  }
+
+  Future<String> getFormattedProductsMap() async {
+    try {
+      Database db = await instance.database;
+      //Map map = {};
+      //Map product = {};
+      var data = await db.rawQuery("select $_colPid, $_colQty, $_colPrice from $_tableName");
+      // print(data.runtimeType);
+      // print(data);
+      var jsonEncodeData = json.encode(data);
+      // String jsonData=json.decode(jsonEncodeData);
+      //print(jsonEncodeData);
+      return jsonEncodeData;
+    } catch (e) {
+      print(e);
+    }
   }
 }
 /*pid TEXT--
@@ -143,3 +187,36 @@ price REAL--
 qty INTEGER--
 qty_res INTEGER
 img TEXT*/
+
+/*
+  Future<Map> getAllProductsIdQty() async {
+    Map<String, dynamic> map = {};
+    try {
+      var data = await getAllProducts();
+      // print(data.runtimeType);
+      // print(data);
+      data.forEach((element) {
+        map[element[_colProductId]] = {_colQty: element[_colQty], _colQtyRes: element[_colQtyRes]};
+      });
+      print(map);
+      //  return map;
+    } catch (e) {
+      print(e.toString());
+      return map;
+    }
+  }
+*/
+/*
+[
+  {
+    "id": "f0f79613-90a5-11eb-8412-ee500252f38c",
+    "qty": "2",
+    "price": "21.0"
+  },
+  {
+    "id": "f0f792f1-90a5-11eb-8412-ee500252f38c",
+    "qty": "1",
+    "price": "21.0"
+  }
+]
+*/

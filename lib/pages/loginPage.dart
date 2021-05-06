@@ -12,6 +12,10 @@ import 'package:provider/provider.dart';
 class LoginPage extends StatefulWidget {
   static final String routeName = "/loginPage";
 
+  final int goToPage;
+
+  LoginPage({@required this.goToPage});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -43,13 +47,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: height,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
-                        begin: Alignment.centerRight,
-                        end: Alignment.topLeft,
-                        colors: [
-                      primary2,
-                      primaryLight,
-                      primaryLight.withOpacity(0.7)
-                    ])),
+                        begin: Alignment.centerRight, end: Alignment.topLeft, colors: [primary2, primaryLight, primaryLight.withOpacity(0.7)])),
               ),
             ),
             Center(
@@ -61,8 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                     Hero(
                       tag: 'logo',
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 60, right: 60, bottom: 30),
+                        padding: const EdgeInsets.only(left: 60, right: 60, bottom: 30),
                         child: Container(
                           height: width / 2,
                           width: width / 2,
@@ -83,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: CircleAvatar(
                             radius: 50.0,
-                            backgroundImage: AssetImage("images/logo.png"),
+                            backgroundImage: AssetImage("images/aloo_kanda_icon.png"),
                           ),
                         ),
                       ),
@@ -94,16 +91,13 @@ class _LoginPageState extends State<LoginPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: primary2.withOpacity(0.35),
-                                  blurRadius: 8.0,
-                                  offset: Offset(3, 3),
-                                ),
-                              ]),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), boxShadow: [
+                            BoxShadow(
+                              color: primary2.withOpacity(0.35),
+                              blurRadius: 8.0,
+                              offset: Offset(3, 3),
+                            ),
+                          ]),
                           child: Padding(
                             padding: const EdgeInsets.all(25.0),
                             child: Column(
@@ -111,8 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                                 TextFormField(
                                   controller: tec_mobile,
                                   decoration: textfield1Deco.copyWith(
-                                    prefixIcon:
-                                        Icon(Icons.phone, color: primary2),
+                                    prefixIcon: Icon(Icons.phone, color: primary2),
                                     hintText: "Enter you mobile number",
                                     labelText: "Mobile Number",
                                   ),
@@ -128,10 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                                   },
                                 ),
                                 Container(
-                                  child: isLoading
-                                      ? Center(
-                                          child: CircularProgressIndicator())
-                                      : Container(),
+                                  child: isLoading ? Center(child: CircularProgressIndicator()) : Container(),
                                 ),
                                 SizedBox(height: 30),
                                 getButton(
@@ -142,27 +132,30 @@ class _LoginPageState extends State<LoginPage> {
                                       setState(() {
                                         isLoading = true;
                                       });
-                                      await Provider.of<ShopDataProvider>(
-                                              context,
-                                              listen: false)
-                                          .checkMobile(tec_mobile.text)
-                                          .then((value) {
+                                      await Provider.of<ShopDataProvider>(context, listen: false).checkMobile(tec_mobile.text).then((value) {
                                         setState(() {
                                           isLoading = false;
                                         });
                                         if (value)
                                           Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) => OtpPage(
-                                                      tec_mobile.text)));
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => OtpPage(
+                                                mobileNo: tec_mobile.text,
+                                                goToPage: widget.goToPage,
+                                              ),
+                                            ),
+                                          );
                                         else
                                           Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      RegisterPage(
-                                                          tec_mobile.text)));
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => RegisterPage(
+                                                mobileNo: tec_mobile.text,
+                                                goToPage: widget.goToPage,
+                                              ),
+                                            ),
+                                          );
                                       }).catchError((e) {
                                         setState(() {
                                           isLoading = false;
@@ -171,8 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                                             context: context,
                                             builder: (context) {
                                               return AlertDialog(
-                                                title: Text(
-                                                    "An error has Occurred"),
+                                                title: Text("An error has Occurred"),
                                                 content: Text(e.toString()),
                                               );
                                             });

@@ -23,10 +23,10 @@ import 'package:sqflite/sqflite.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     runApp(new MyApp());
   });
+  //runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -36,12 +36,9 @@ class MyApp extends StatelessWidget {
     // Database db = SqlfliteDatabaseProvider.instance.database as Database;
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<ShopDataProvider>(
-            create: (_) => ShopDataProvider()),
-        ChangeNotifierProvider<CartDataProvider>(
-            create: (_) => CartDataProvider.instance),
-        ChangeNotifierProvider<SharedPrefProvider>(
-            create: (_) => SharedPrefProvider()),
+        ChangeNotifierProvider<ShopDataProvider>(create: (_) => ShopDataProvider()),
+        ChangeNotifierProvider<CartDataProvider>(create: (_) => CartDataProvider.instance),
+        ChangeNotifierProvider<SharedPrefProvider>(create: (_) => SharedPrefProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',

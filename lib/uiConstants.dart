@@ -8,7 +8,7 @@ var inputDeco = InputDecoration(
   enabledBorder: OutlineInputBorder(
     borderRadius: BorderRadius.circular(10.0),
     borderSide: BorderSide(
-      color: primaryLight,
+      color: primaryDark,
       width: 2.0,
     ),
   ),
@@ -75,7 +75,12 @@ Color primaryLight = Color.fromRGBO(194, 228, 255, 1);
 Color primaryDark = Color.fromRGBO(141, 161, 159, 1);
 
 */
-
+/*
 Color primary2 = Color.fromRGBO(206, 100, 142, 1); //most used color, Used as primary color
 Color primaryLight = Color.fromRGBO(255, 168, 203, 1); //Used as primaryAccent color
-Color primaryDark = Color.fromRGBO(82, 0, 33, 1);
+Color primaryDark = Color.fromRGBO(82, 0, 33, 1);*/
+
+Color primary2 = Color.fromRGBO(37, 179, 130, 1); //most used color, Used as primary color
+Color primaryLight = Color.fromRGBO(41, 187, 137, 1); //Used as primaryAccent color
+
+Color primaryDark = Color.fromRGBO(30, 111, 92, 1);

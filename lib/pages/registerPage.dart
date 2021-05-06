@@ -6,17 +6,20 @@ import 'package:chef_choice/providers/sharedPrefProvider.dart';
 import 'package:chef_choice/providers/shopDataProvider.dart';
 import 'package:chef_choice/uiConstants.dart';
 import 'package:chef_choice/uiResources/MyClipper.dart';
+import 'package:chef_choice/uiResources/PageConstant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
+import 'homePage.dart';
+
 class RegisterPage extends StatefulWidget {
   static final String routeName = "/regPage";
 
   final String mobileNo;
-
-  RegisterPage(this.mobileNo);
+  final int goToPage;
+  RegisterPage({@required this.mobileNo, @required this.goToPage});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -426,7 +429,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                                       _tecAddr.text,
                                                       _tecLandMark.text,
                                                       _tecCity.text,
-                                                      _tecState.text,
+                                                      _selectedState,
                                                       _tecPincode.text,
                                                       _tecOtp.text)
                                                   .then((userData) async {
@@ -436,7 +439,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                                     isLoading = false;
                                                   });
                                                   if (value) {
-                                                    Navigator.pushNamed(context, TimeSlotPage.routeName);
+                                                    if (widget.goToPage == PageConstant.TimSlotPage)
+                                                      Navigator.pushNamed(context, TimeSlotPage.routeName);
+                                                    if (widget.goToPage == PageConstant.SettingPage)
+                                                      Navigator.pushAndRemoveUntil(
+                                                          context, MaterialPageRoute(builder: (context) => HomePage(2)), (route) => false);
                                                   } else {
                                                     showDialog(
                                                       context: context,
@@ -488,7 +495,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     height: 150,
                     width: 150,
-                    decoration: mainContainerBoxDecor.copyWith(color: primaryLight),
+                    decoration: mainContainerBoxDecor.copyWith(color: primary2),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [

@@ -1,15 +1,18 @@
+import 'package:chef_choice/pages/homePage.dart';
 import 'package:chef_choice/pages/timeSlotPage.dart';
 import 'package:chef_choice/providers/sharedPrefProvider.dart';
 import 'package:chef_choice/providers/shopDataProvider.dart';
 import 'package:chef_choice/uiConstants.dart';
 import 'package:chef_choice/uiResources/MyClipper.dart';
+import 'package:chef_choice/uiResources/PageConstant.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class OtpPage extends StatefulWidget {
   static final String routeName = "/otpPage";
   final mobileNo;
-  OtpPage(this.mobileNo);
+  final int goToPage;
+  OtpPage({@required this.mobileNo, @required this.goToPage});
 
   @override
   _OtpPageState createState() => _OtpPageState();
@@ -42,13 +45,7 @@ class _OtpPageState extends State<OtpPage> {
                 height: height,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
-                        begin: Alignment.centerRight,
-                        end: Alignment.topLeft,
-                        colors: [
-                      primary2,
-                      primaryLight,
-                      primaryLight.withOpacity(0.7)
-                    ])),
+                        begin: Alignment.centerRight, end: Alignment.topLeft, colors: [primary2, primaryLight, primaryLight.withOpacity(0.7)])),
               ),
             ),
             Center(
@@ -60,8 +57,7 @@ class _OtpPageState extends State<OtpPage> {
                     Hero(
                       tag: 'logo',
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 60, right: 60, bottom: 30),
+                        padding: const EdgeInsets.only(left: 60, right: 60, bottom: 30),
                         child: Container(
                           height: width / 2,
                           width: width / 2,
@@ -82,7 +78,7 @@ class _OtpPageState extends State<OtpPage> {
                           ),
                           child: CircleAvatar(
                             radius: 50.0,
-                            backgroundImage: AssetImage("images/logo.png"),
+                            backgroundImage: AssetImage("images/aloo_kanda_icon.png"),
                           ),
                         ),
                       ),
@@ -93,16 +89,13 @@ class _OtpPageState extends State<OtpPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: primary2.withOpacity(0.35),
-                                  blurRadius: 8.0,
-                                  offset: Offset(3, 3),
-                                ),
-                              ]),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), boxShadow: [
+                            BoxShadow(
+                              color: primary2.withOpacity(0.35),
+                              blurRadius: 8.0,
+                              offset: Offset(3, 3),
+                            ),
+                          ]),
                           child: Padding(
                             padding: const EdgeInsets.all(25.0),
                             child: Column(
@@ -110,8 +103,7 @@ class _OtpPageState extends State<OtpPage> {
                                 TextFormField(
                                   controller: tec_otp,
                                   decoration: textfield1Deco.copyWith(
-                                    prefixIcon:
-                                        Icon(Icons.lock_clock, color: primary2),
+                                    prefixIcon: Icon(Icons.lock_clock, color: primary2),
                                     hintText: "Enter you OTP number",
                                     labelText: "OTP",
                                   ),
@@ -125,50 +117,40 @@ class _OtpPageState extends State<OtpPage> {
                                 ),
                                 SizedBox(height: 10),
                                 Container(
-                                  child: isLoading
-                                      ? Center(
-                                          child: CircularProgressIndicator())
-                                      : Container(),
+                                  child: isLoading ? Center(child: CircularProgressIndicator()) : Container(),
                                 ),
                                 SizedBox(height: 10),
                                 getButton(
                                   "Login",
                                   Icons.login,
                                   () async {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
                                     if (_key.currentState.validate()) {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
                                       //Check otp, if valid, session will be recieved or go to catchError(Outer)
-                                      await Provider.of<ShopDataProvider>(
-                                              context,
-                                              listen: false)
-                                          .checkOTP(
-                                              widget.mobileNo, tec_otp.text)
+                                      await Provider.of<ShopDataProvider>(context, listen: false)
+                                          .checkOTP(widget.mobileNo, tec_otp.text)
                                           .then((userData) async {
                                         //=================================================================
                                         //session is retrieved, save session,
 
-                                        await Provider.of<SharedPrefProvider>(
-                                                context,
-                                                listen: false)
-                                            .save(userData)
-                                            .then((value) {
+                                        await Provider.of<SharedPrefProvider>(context, listen: false).save(userData).then((value) {
                                           setState(() {
                                             isLoading = false;
                                           });
                                           if (value) {
-                                            Navigator.pushNamed(context,
-                                                TimeSlotPage.routeName);
+                                            if (widget.goToPage == PageConstant.TimSlotPage) Navigator.pushNamed(context, TimeSlotPage.routeName);
+                                            if (widget.goToPage == PageConstant.SettingPage)
+                                              Navigator.pushAndRemoveUntil(
+                                                  context, MaterialPageRoute(builder: (context) => HomePage(2)), (route) => false);
                                           } else {
                                             showDialog(
                                               context: context,
                                               builder: (context) {
                                                 return AlertDialog(
-                                                  title: Text(
-                                                      "Something went wrong!"),
-                                                  content: Text(
-                                                      "Session Not Saved!"),
+                                                  title: Text("Something went wrong!"),
+                                                  content: Text("Session Not Saved!"),
                                                 );
                                               },
                                             );
@@ -188,8 +170,7 @@ class _OtpPageState extends State<OtpPage> {
                                             context: context,
                                             builder: (context) {
                                               return AlertDialog(
-                                                title: Text(
-                                                    "Something went wrong!"),
+                                                title: Text("Something went wrong!"),
                                                 content: Text(e.toString()),
                                               );
                                             },

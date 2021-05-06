@@ -5,9 +5,12 @@ import 'package:chef_choice/pages/changePasswordPage.dart';
 import 'package:chef_choice/pages/loginPage.dart';
 import 'package:chef_choice/pages/ordersPage.dart';
 import 'package:chef_choice/pages/profilePage.dart';
+import 'package:chef_choice/pages/shopInfoPage.dart';
+import 'package:chef_choice/providers/cartDataProvider.dart';
 import 'package:chef_choice/providers/sharedPrefProvider.dart';
 import 'package:chef_choice/providers/shopDataProvider.dart';
 import 'package:chef_choice/uiConstants.dart';
+import 'package:chef_choice/uiResources/PageConstant.dart';
 import 'package:chef_choice/uiResources/SettingsListTile.dart';
 import 'package:chef_choice/uiResources/WebViewCotainer.dart';
 import 'package:chef_choice/uiResources/headCurvedContainer.dart';
@@ -87,7 +90,7 @@ class _SettingTabState extends State<SettingTab> {
                             "${userData['first_name']} ${userData['last_name']}",
                             style: TextStyle(fontSize: 25, letterSpacing: 1.5),
                           ),
-                          IconButton(
+                          /*IconButton(
                             icon: Icon(
                               Icons.edit,
                               color: primary2,
@@ -95,7 +98,7 @@ class _SettingTabState extends State<SettingTab> {
                             onPressed: () {
                               Navigator.pushNamed(context, ProfilePage.routeName);
                             },
-                          ),
+                          ),*/
                         ],
                       ),
                       SizedBox(height: sizedBoxHeight),
@@ -109,11 +112,24 @@ class _SettingTabState extends State<SettingTab> {
                               SettingsListTile(
                                 title: "My Orders",
                                 iconData: Icons.delivery_dining,
-                                onTap: () {
-                                  Navigator.pushNamed(context, OrdersPage.routeName);
+                                onTap: () async {
+                                  await Provider.of<SharedPrefProvider>(context, listen: false).isLoggedIn().then((value) {
+                                    if (value) {
+                                      Navigator.pushNamed(context, OrdersPage.routeName);
+                                    } else {
+                                      showSimpleDialog("Not logged in!", "Please login to see you orders");
+                                    }
+                                  });
                                 },
                               ),
                               Divider(color: primary2),
+                              SettingsListTile(
+                                title: "About Shop",
+                                iconData: Icons.storefront_outlined,
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ShopInfoPage()));
+                                },
+                              ),
                               ListView.builder(
                                   scrollDirection: Axis.vertical,
                                   shrinkWrap: true,
@@ -148,27 +164,31 @@ class _SettingTabState extends State<SettingTab> {
                                                     builder: (context) {
                                                       return AlertDialog(
                                                         title: Text("Logging out...."),
-                                                        content: Text("Do you want to log out?"),
+                                                        content: Text("Do you want to log out? All products in you cart will bew deleted!"),
                                                         actions: [
                                                           getButton("Yes", Icons.logout, () async {
                                                             setState(() {
                                                               isLoading = true;
                                                             });
-                                                            await Provider.of<SharedPrefProvider>(context, listen: false).clearData().then((value) {
-                                                              setState(() {
-                                                                _userFutureData = getFutureData();
+                                                            await Provider.of<CartDataProvider>(context, listen: false)
+                                                                .truncateTable()
+                                                                .then((value) async {
+                                                              await Provider.of<SharedPrefProvider>(context, listen: false).clearData().then((value) {
+                                                                setState(() {
+                                                                  _userFutureData = getFutureData();
 
-                                                                _checkLogin = checkLogin();
-                                                                isLoading = false;
+                                                                  _checkLogin = checkLogin();
+                                                                  isLoading = false;
+                                                                });
+                                                                Navigator.pop(context);
+
+                                                                if (value) {
+                                                                  showSimpleDialog("Logout successful", "Thank you for shopping with us!");
+                                                                } else {
+                                                                  showSimpleDialog("Something went wrong",
+                                                                      "Please contact technical assistant or try again later");
+                                                                }
                                                               });
-                                                              Navigator.pop(context);
-
-                                                              if (value) {
-                                                                showSimpleDialog("Logout successful", "Thank you for shopping with us!");
-                                                              } else {
-                                                                showSimpleDialog(
-                                                                    "Something went wrong", "Please contact technical assistant or try again later");
-                                                              }
                                                             });
                                                           }),
                                                           getButton("No", Icons.cancel_outlined, () {
@@ -182,7 +202,14 @@ class _SettingTabState extends State<SettingTab> {
                                           : SettingsListTile(
                                               title: "Log In",
                                               iconData: Icons.login,
-                                              onTap: () {},
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => LoginPage(goToPage: PageConstant.SettingPage),
+                                                  ),
+                                                );
+                                              },
                                             );
                                     } else {
                                       return Center(child: CircularProgressIndicator());

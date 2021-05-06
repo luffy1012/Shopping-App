@@ -11,11 +11,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
 import 'package:provider/provider.dart';
+import 'package:html/parser.dart';
 
 class ProductPage extends StatefulWidget {
-  final String product_id;
+  final String product_id, title;
 
-  ProductPage(this.product_id);
+  ProductPage(this.title, this.product_id);
 
   @override
   _ProductPageState createState() => _ProductPageState();
@@ -39,18 +40,20 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     //var height = MediaQuery.of(context).size.height;
+    var doc = parse(widget.title);
+    var title = parse(doc.body.text).documentElement.text;
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        title: Text(title),
         iconTheme: IconThemeData(color: primary2),
         backgroundColor: Colors.white,
       ),
       body: FutureBuilder(
           future: _myFuture,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting ||
-                !snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
             } else {
               if (snapshot.data.title == "error") {
@@ -64,12 +67,11 @@ class _ProductPageState extends State<ProductPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       //Product name
-                      ProductTitleWidget(product: product),
+                      ProductTitleWidget(productTitle: title),
                       //image
                       ProductImageSlider(width: width, product: product),
                       //price,desc,qty,etc
-                      ProductDetailsWidget(
-                          product: product, prodQtyRes: prodQtyRes),
+                      ProductDetailsWidget(product: product, prodQtyRes: prodQtyRes),
                     ],
                   ),
                 );
@@ -89,9 +91,7 @@ class _ProductPageState extends State<ProductPage> {
         if (snapshot.hasData) {
           // print(snapshot.data.product_id);
           return Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(blurRadius: 2, color: Colors.grey)]),
+              decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(blurRadius: 2, color: Colors.grey)]),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -112,9 +112,7 @@ class _ProductPageState extends State<ProductPage> {
                             decoration: BoxDecoration(
                               color: primary2.withOpacity(0.8),
                               border: Border.all(color: primary2),
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10)),
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
                             ),
                             child: Icon(
                               Icons.remove,
@@ -134,8 +132,7 @@ class _ProductPageState extends State<ProductPage> {
                           child: Center(
                               child: Text(
                             "$prodQuantity",
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                           )),
                         ),
                         GestureDetector(
@@ -157,8 +154,7 @@ class _ProductPageState extends State<ProductPage> {
                                     ],
                                   ),
                                 );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
                               }
                             });
                           },
@@ -168,9 +164,7 @@ class _ProductPageState extends State<ProductPage> {
                             decoration: BoxDecoration(
                               color: primary2.withOpacity(0.8),
                               border: Border.all(color: primary2),
-                              borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(10),
-                                  bottomRight: Radius.circular(10)),
+                              borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
                             ),
                             child: Icon(
                               Icons.add,
@@ -182,18 +176,14 @@ class _ProductPageState extends State<ProductPage> {
                     ),
                   ),
                   getButton("Add to cart", Icons.add_shopping_cart, () async {
-                    List productData = await Provider.of<CartDataProvider>(
-                            context,
-                            listen: false)
-                        .getRowByID(product.product_id);
+                    List productData = await Provider.of<CartDataProvider>(context, listen: false).getRowByID(product.product_id);
                     if (productData.isNotEmpty) {
                       print("Product EXists");
                       //TODO: product exists check qty and program accordingly
-                      int purchasedQty =
-                          productData[0][CartDataProvider.colQty];
-                      int productQtyRes =
-                          productData[0][CartDataProvider.colQtyRes];
+                      int purchasedQty = productData[0][CartDataProvider.colQty];
+                      int productQtyRes = productData[0][CartDataProvider.colQtyRes];
                       Map<String, dynamic> row = {
+                        CartDataProvider.colPid: product.p_id,
                         CartDataProvider.colProductId: product.product_id,
                         CartDataProvider.colProductName: product.title,
                         CartDataProvider.colPrice: double.parse(product.price),
@@ -201,9 +191,7 @@ class _ProductPageState extends State<ProductPage> {
                         CartDataProvider.colQtyRes: prodQtyRes,
                         CartDataProvider.colImgUrl: product.imgUrls[0]
                       };
-                      int i = await Provider.of<CartDataProvider>(context,
-                              listen: false)
-                          .updateCart(row);
+                      int i = await Provider.of<CartDataProvider>(context, listen: false).updateCart(row);
                       final snackBar = cartAddSnackBar(context);
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       print(i);
@@ -212,6 +200,7 @@ class _ProductPageState extends State<ProductPage> {
 
                       //TODO: add product
                       Map<String, dynamic> row = {
+                        CartDataProvider.colPid: product.p_id,
                         CartDataProvider.colProductId: product.product_id,
                         CartDataProvider.colProductName: product.title,
                         CartDataProvider.colPrice: double.parse(product.price),
@@ -219,9 +208,7 @@ class _ProductPageState extends State<ProductPage> {
                         CartDataProvider.colQtyRes: prodQtyRes,
                         CartDataProvider.colImgUrl: product.imgUrls[0]
                       };
-                      int i = await Provider.of<CartDataProvider>(context,
-                              listen: false)
-                          .insertProduct(row);
+                      int i = await Provider.of<CartDataProvider>(context, listen: false).insertProduct(row);
                       print(i);
                       final snackBar = cartAddSnackBar(context);
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -242,16 +229,11 @@ class _ProductPageState extends State<ProductPage> {
       content: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-              child: Text("Product added to cart! (Quantity : $prodQuantity)")),
+          Container(child: Text("Product added to cart! (Quantity : $prodQuantity)")),
           TextButton(
-            style: TextButton.styleFrom(
-                backgroundColor: Colors.white, primary: primaryDark),
+            style: TextButton.styleFrom(backgroundColor: Colors.white, primary: primaryDark),
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage(1)),
-                  (route) => false);
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage(1)), (route) => false);
             },
             child: Text("View Cart"),
           )
@@ -261,8 +243,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  SimpleDialog purchaseAlertDialog(
-      BuildContext context, String title, String content) {
+  SimpleDialog purchaseAlertDialog(BuildContext context, String title, String content) {
     return SimpleDialog(
       titlePadding: EdgeInsets.all(10),
       contentPadding: EdgeInsets.all(8),
@@ -296,14 +277,12 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   Future getProduct(String productId) async {
-    var data = await Provider.of<ShopDataProvider>(context, listen: false)
-        .getProductDetails(productId);
+    var data = await Provider.of<ShopDataProvider>(context, listen: false).getProductDetails(productId);
     return data;
   }
 
   Future getCartProduct(String productID) async {
-    var data = await Provider.of<CartDataProvider>(context, listen: false)
-        .getRowByID(productID);
+    var data = await Provider.of<CartDataProvider>(context, listen: false).getRowByID(productID);
     if (data.length == 0) {
       prodQuantity = 1;
     } else {
@@ -329,18 +308,13 @@ class ProductDetailsWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding:
-              const EdgeInsets.only(left: 8.0, right: 8, top: 8, bottom: 4),
+          padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8, bottom: 4),
           child: Row(
             children: [
-              Text("Price : ₹ ${product.price} ",
-                  style: TextStyle(fontSize: 23, color: Colors.black)),
+              Text("Price : ₹ ${product.price} ", style: TextStyle(fontSize: 23, color: Colors.black)),
               Text(
                 "₹ ${product.oldPrice}",
-                style: TextStyle(
-                    decoration: TextDecoration.lineThrough,
-                    color: Colors.grey,
-                    fontSize: 18),
+                style: TextStyle(decoration: TextDecoration.lineThrough, color: Colors.grey, fontSize: 18),
               )
             ],
           ),
@@ -396,20 +370,15 @@ class ProductImageSlider extends StatelessWidget {
       child: Container(
         width: width - 20,
         height: width - 60,
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                offset: Offset(0, 0),
-                blurRadius: 5,
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 5,
-              )
-            ]),
-        child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: SwipeImage(product.imgUrls)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), boxShadow: [
+          BoxShadow(
+            offset: Offset(0, 0),
+            blurRadius: 5,
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 5,
+          )
+        ]),
+        child: ClipRRect(borderRadius: BorderRadius.circular(15), child: SwipeImage(product.imgUrls)),
       ),
     );
   }
@@ -418,23 +387,18 @@ class ProductImageSlider extends StatelessWidget {
 class ProductTitleWidget extends StatelessWidget {
   const ProductTitleWidget({
     Key key,
-    @required this.product,
+    @required this.productTitle,
   }) : super(key: key);
 
-  final Product product;
+  final String productTitle;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Html(
-        data: product.title,
-        style: {
-          "*": Style(
-              fontSize: FontSize.xLarge,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 1.5)
-        },
+      child: Text(
+        productTitle,
+        style: TextStyle(fontSize: 25, letterSpacing: 1.5, fontWeight: FontWeight.w400),
       ),
     );
   }

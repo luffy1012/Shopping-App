@@ -7,6 +7,7 @@ import 'package:chef_choice/pages/bannerProductsList.dart';
 import 'package:chef_choice/pages/productCategoryPage.dart';
 import 'package:chef_choice/pages/productPage.dart';
 import 'package:chef_choice/providers/cartDataProvider.dart';
+import 'package:chef_choice/providers/sharedPrefProvider.dart';
 import 'package:chef_choice/providers/shopDataProvider.dart';
 import 'package:chef_choice/uiConstants.dart';
 import 'package:chef_choice/uiResources/WebViewCotainer.dart';
@@ -28,7 +29,6 @@ class _HomeTabState extends State<HomeTab> {
   final _formKey = GlobalKey<FormState>();
 
   Future _futureData;
-  Future _cartProductData;
   List categories;
 
   int _selectedPincode;
@@ -41,7 +41,6 @@ class _HomeTabState extends State<HomeTab> {
   void initState() {
     // TODO: implement initState
     _futureData = getShopDetails();
-    _cartProductData = getCartProductData();
     super.initState();
     tec_pincode = TextEditingController();
   }
@@ -54,9 +53,14 @@ class _HomeTabState extends State<HomeTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          getButton("Testing", Icons.adb_outlined, () async {
-            await Provider.of<CartDataProvider>(context, listen: false).getAllProductsIdQty();
-          }),
+          /*getButton("TESTING", Icons.adb_outlined, () async {
+            await Provider.of<ShopDataProvider>(context, listen: false).getOrderList();
+            */ /*await Provider.of<CartDataProvider>(context, listen: false).getFormattedProductsMap();
+               await Provider.of<CartDataProvider>(context, listen: false).getFormattedProductsMap().then((value) async {
+              // print(value);
+              await Provider.of<ShopDataProvider>(context, listen: false).getSchedule("2021-04-27", value);
+            });*/ /*
+          }),*/
           pincodeTile(context),
           bannerCarousel(context, width, height),
           categoryContainer(context),
@@ -87,45 +91,50 @@ class _HomeTabState extends State<HomeTab> {
           );
         } else {
           List<MyBanner> banners = snapshot.data['banners'];
-          // print(banners);
-          return Container(
-            child: CarouselSlider.builder(
-              itemCount: banners.length,
-              itemBuilder: (BuildContext context, int index, int index2) {
-                return GestureDetector(
-                  onTap: () {
-                    if (banners[index].ban_type == "external") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => WebViewContainer(banners[index].ban_title, banners[index].ban_link),
+          //print(banners);
+
+          return (banners.length != 0)
+              ? Container(
+                  child: CarouselSlider.builder(
+                    itemCount: banners.length,
+                    itemBuilder: (BuildContext context, int index, int index2) {
+                      return GestureDetector(
+                        onTap: () {
+                          if (banners[index].ban_type == "external") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WebViewContainer(banners[index].ban_title, banners[index].ban_link),
+                              ),
+                            );
+                          } else if (banners[index].ban_type == "category" || banners[index].ban_type == "product") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    BannerProductsList(banners[index].ban_title, banners[index].ban_type, banners[index].ban_details),
+                              ),
+                            ).then((value) => setState(() {}));
+                            ;
+                          }
+                        },
+                        child: Card(
+                          elevation: 2,
+                          child: Container(
+                            child: CachedNetworkImage(imageUrl: banners[index].ban_img),
+                          ),
                         ),
                       );
-                    } else if (banners[index].ban_type == "category" || banners[index].ban_type == "product") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BannerProductsList(banners[index].ban_title, banners[index].ban_type, banners[index].ban_details),
-                        ),
-                      );
-                    }
-                  },
-                  child: Card(
-                    elevation: 2,
-                    child: Container(
-                      child: CachedNetworkImage(imageUrl: banners[index].ban_img),
-                    ),
+                    },
+                    options: CarouselOptions(
+                        aspectRatio: width / (height / 6),
+                        autoPlay: true,
+                        autoPlayAnimationDuration: Duration(milliseconds: 700),
+                        autoPlayCurve: Curves.easeInOutSine,
+                        viewportFraction: 1),
                   ),
-                );
-              },
-              options: CarouselOptions(
-                  aspectRatio: width / (height / 6),
-                  autoPlay: true,
-                  autoPlayAnimationDuration: Duration(milliseconds: 700),
-                  autoPlayCurve: Curves.easeInOutSine,
-                  viewportFraction: 1),
-            ),
-          );
+                )
+              : Container();
         }
       },
     );
@@ -264,7 +273,7 @@ class _HomeTabState extends State<HomeTab> {
                             setState(() {});
                             return value;
                           } else {
-                            pincodeMessage = "Something went wrong! Please check location services are enabled!";
+                            pincodeMessage = "Please enable GPS!";
                             pincodeFlag = false;
                           }
                         }).catchError((e) {
@@ -291,78 +300,81 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   Widget categoryContainer(BuildContext context) {
-    return Container(
-      decoration: mainContainerBoxDecor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "Shop by Category",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400, letterSpacing: 1.5),
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Container(
+        decoration: mainContainerBoxDecor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Shop by Category",
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400, letterSpacing: 1.5),
+              ),
             ),
-          ),
-          FutureBuilder(
-            future: _futureData,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 200,
-                  color: Colors.white,
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              } else if (snapshot.hasError) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Text(
-                    "Something went wrong!!",
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              } else {
-                if (snapshot.data['categories'][0].id == "error") {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "🙁\nSomething went wrong! Please check your internet connection!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
-                      ),
+            FutureBuilder(
+              future: _futureData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 200,
+                    color: Colors.white,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                } else if (snapshot.hasError) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: Text(
+                      "Something went wrong!!",
+                      textAlign: TextAlign.center,
                     ),
                   );
                 } else {
-                  categories = snapshot.data['categories'];
-                  //print(categories);
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GridView.builder(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        physics: ScrollPhysics(),
-                        itemCount: categories.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3, childAspectRatio: 1, crossAxisSpacing: 1, mainAxisSpacing: 1),
-                        itemBuilder: (BuildContext context, int index) {
-                          return CategoryTile(categories[index].cat_img, categories[index].name, () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProductCategoryPage(
-                                        category_id: categories[index].c_uid,
-                                        title: categories[index].name,
-                                      )),
-                            );
-                          });
-                        }),
-                  );
+                  if (snapshot.data['categories'][0].id == "error") {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "🙁\nSomething went wrong! Please check your internet connection!",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
+                        ),
+                      ),
+                    );
+                  } else {
+                    categories = snapshot.data['categories'];
+                    //print(categories);
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          itemCount: categories.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3, childAspectRatio: 1, crossAxisSpacing: 1, mainAxisSpacing: 1),
+                          itemBuilder: (BuildContext context, int index) {
+                            return CategoryTile(categories[index].cat_img, categories[index].name, () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductCategoryPage(
+                                          category_id: categories[index].c_uid,
+                                          title: categories[index].name,
+                                        )),
+                              ).then((value) => setState(() {}));
+                            });
+                          }),
+                    );
+                  }
                 }
-              }
-            },
-          ),
-        ],
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -372,86 +384,82 @@ class _HomeTabState extends State<HomeTab> {
       padding: const EdgeInsets.all(4.0),
       child: Container(
         decoration: mainContainerBoxDecor,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Featured Products",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400, letterSpacing: 1.5),
-              ),
-              FutureBuilder(
-                future: Future.wait([_futureData, _cartProductData]),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData)
-                    return Center(child: CircularProgressIndicator());
-                  else {
-                    if (snapshot.data[0]['featuredProducts'][0].product_id == "error") {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "🙁\nCurrently no product is available of this category!",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
-                          ),
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Featured Products",
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400, letterSpacing: 1.5),
+            ),
+            FutureBuilder(
+              future: _futureData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData)
+                  return Center(child: CircularProgressIndicator());
+                else {
+                  if (snapshot.data['featuredProducts'][0].product_id == "error") {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "🙁\nNo featured product is available at the moment!",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
                         ),
-                      );
-                    } else {
-                      var products = snapshot.data[0]['featuredProducts'];
-                      Map purchasedProducts = snapshot.data[1];
-                      print(purchasedProducts.runtimeType);
-                      print(purchasedProducts);
-                      return SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GridView.builder(
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              physics: ScrollPhysics(),
-                              itemCount: products.length,
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75),
-                              itemBuilder: (BuildContext context, int index) {
-                                return ProductTile(
-                                  products[index],
-                                  purchasedProducts,
-                                  () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => ProductPage(products[index].product_id)),
-                                    );
-                                  },
-                                );
-                              }),
-                        ),
-                      );
-                    }
+                      ),
+                    );
+                  } else {
+                    var products = snapshot.data['featuredProducts'];
+
+                    return SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GridView.builder(
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            physics: ScrollPhysics(),
+                            itemCount: products.length,
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75),
+                            itemBuilder: (BuildContext context, int index) {
+                              return ProductTile(
+                                products[index],
+                                callProductCount,
+                                () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => ProductPage(products[index].product_title, products[index].product_id)),
+                                  ).then((value) => setState(() {}));
+                                },
+                              );
+                            }),
+                      ),
+                    );
                   }
-                },
-              ),
-              /*GridView.builder(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  physics: ScrollPhysics(),
-                  itemCount: products.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, childAspectRatio: 1),
-                  itemBuilder: (BuildContext context, int index) {
-                    return ProductTile(products[index], () {
-                      //print(products[index].runtimeType);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProductPage(
-                            product: products[index],
-                          ),
+                }
+              },
+            ),
+            /*GridView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                itemCount: products.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, childAspectRatio: 1),
+                itemBuilder: (BuildContext context, int index) {
+                  return ProductTile(products[index], () {
+                    //print(products[index].runtimeType);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductPage(
+                          product: products[index],
                         ),
-                      );
-                    });
-                  })*/
-            ],
-          ),
+                      ),
+                    );
+                  });
+                })*/
+          ],
         ),
       ),
     );
@@ -462,8 +470,7 @@ class _HomeTabState extends State<HomeTab> {
     return data;
   }
 
-  Future getCartProductData() async {
-    var data = Provider.of<CartDataProvider>(context, listen: false).getAllProductsIdQty();
-    return data;
+  callProductCount() {
+    print("callback ");
   }
 }

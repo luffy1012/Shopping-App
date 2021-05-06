@@ -1,11 +1,17 @@
+import 'dart:async';
+
+import 'package:badges/badges.dart';
 import 'package:chef_choice/pages/productPage.dart';
+import 'package:chef_choice/providers/cartDataProvider.dart';
 import 'package:chef_choice/providers/shopDataProvider.dart';
 import 'package:chef_choice/uiConstants.dart';
 import 'package:chef_choice/uiResources/productTile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BannerProductsList extends StatelessWidget {
+import 'homePage.dart';
+
+class BannerProductsList extends StatefulWidget {
   final String bannerTitle;
   final String bannerType;
   final String bannerDetails;
@@ -13,18 +19,74 @@ class BannerProductsList extends StatelessWidget {
   BannerProductsList(this.bannerTitle, this.bannerType, this.bannerDetails);
 
   @override
+  _BannerProductsListState createState() => _BannerProductsListState();
+}
+
+class _BannerProductsListState extends State<BannerProductsList> {
+  Stream _streamGetProductCount;
+
+  StreamController _controller;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = StreamController();
+    _streamGetProductCount = _controller.stream;
+    callProuductCount();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: primary2),
         backgroundColor: Colors.white,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 15.0),
+            child: Center(
+              child: StreamBuilder(
+                stream: _streamGetProductCount,
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) return Center(child: CircularProgressIndicator());
+
+                  int count = snapshot.data;
+                  print("### count : $count");
+                  return (count == 0)
+                      ? IconButton(
+                          icon: Icon(Icons.shopping_cart_outlined),
+                          onPressed: () {
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage(1)), (route) => false);
+                          },
+                        )
+                      : Badge(
+                          elevation: 0,
+                          position: BadgePosition.topEnd(top: 1, end: 1),
+                          badgeColor: primary2.withOpacity(0.8),
+                          badgeContent: Text(
+                            "$count",
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 10),
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.shopping_cart_outlined),
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage(1)), (route) => false);
+                            },
+                          ),
+                        );
+                },
+              ),
+            ),
+          ),
+        ],
         title: Text(
-          bannerTitle,
+          widget.bannerTitle,
           style: TextStyle(color: primary2),
         ),
       ),
       body: FutureBuilder(
-        future: Provider.of<ShopDataProvider>(context).getBannerOnTapData(bannerType, bannerDetails),
+        future: Provider.of<ShopDataProvider>(context).getBannerOnTapData(widget.bannerType, widget.bannerDetails),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
             return Center(
@@ -52,12 +114,12 @@ class BannerProductsList extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return ProductTile(
                         products[index],
-                        {},
+                        callProuductCount,
                         () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ProductPage(products[index].product_id),
+                              builder: (context) => ProductPage(products[index].product_title, products[index].product_id),
                             ),
                           );
                         },
@@ -91,5 +153,16 @@ class BannerProductsList extends StatelessWidget {
         },
       ),
     );
+  }
+
+  callProuductCount() {
+    getProductCount();
+    print("HELLO");
+  }
+
+  Future getProductCount() async {
+    print("There");
+    var data = await Provider.of<CartDataProvider>(context, listen: false).getNumberOfProducts();
+    _controller.add(data);
   }
 }

@@ -2,38 +2,38 @@ Shop ID: 1
 Key: KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 Endpoint URL: https://my.umart.in/Api
 -------------------------------------------------------------------------------------------------
-
+[1]
 Shop information -> GET
 http://localhost/shop3/api/shopinfo/all/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 -------------------------------------------------------------------------------------------------
-
+[2]
 
 Search Product -> GET
 http://localhost/shop3/api/products/search/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title&keyword=aloo
 -------------------------------------------------------------------------------------------------
-
+[3]
 Listing by category pass category UID -> GET
 
 http://localhost/shop3/api/products/category/8207f882-90a5-11eb-8815-18037332e702?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title
 -------------------------------------------------------------------------------------------------
-
+[4]
 Featured Product List -> GET
 http://localhost/shop3/api/products/featured/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title
 -------------------------------------------------------------------------------------------------
-
+[5]
 All product listing -> GET
 http://localhost/shop3/api/products/all/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title
 
 page 2 -> GET
 http://localhost/shop3/api/products/all/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa&order=asc-title&page=2
 -------------------------------------------------------------------------------------------------
-
+[6]
 
 Product Details - pass Product ID -> GET
 
 http://localhost/shop3/api/products/detailsbyuid/82045d37-90a5-11eb-8815-18037332e702?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 -------------------------------------------------------------------------------------------------
-
+[7]
 Mobile No check - POST
 
 http://localhost/shop3/api/actioninfo/mobilecheck?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
@@ -46,26 +46,28 @@ Parameter mobile
 
     if registration is true -> ask for registration form
     -----------
+[8]
 Registration API - POST
 http://localhost/shop3/api/actioninfo/registration?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 
 Paramaters
 mobile, otp, first_name, last_name, emailid, contactperson, address, state, city, pincode, landmark, contactno
     -----------
-
+[9]
 Login API - POST
 http://localhost/shop3/api/actioninfo/login?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 
 Paramaters
 mobile, otp
     -----------
-
+[10]
 Logout API - POST
 http://localhost/shop3/api/actioninfo/logout?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 
 Parameter
 session
 -------------------------------------------------------------------------------------------------
+[11]
 New Order - POST
 http://localhost/shop3/api/actioninfo/orderpost?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 
@@ -73,9 +75,23 @@ Parameters
 mobile, session
 cadd_id, address, landmark, state, city, pincode, contactperson, contactno
 couponcode, payment_type, specialinstruction, products - (JSON - pid, qty, price)
+book_date, timing
 
+
+
+{"status":false,"message":"minimum order should be 200"}
+
+{
+    "status": true,
+    "session": "db166ecf399388ab428d8b7b6b4ea805",
+    "message": "order done",
+    "data": {
+        "id": "f131b18b-5aa9-0777-ca1c-0ac34feb553d",
+        "redirect": "/account/orderdetails/f131b18b-5aa9-0777-ca1c-0ac34feb553d"
+    }
+}
 -------------------------------------------------------------------------------------------------
-
+[12]
 Order List - POST
 
 http://localhost/shop3/api/actioninfo/orderlist?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
@@ -83,24 +99,191 @@ http://localhost/shop3/api/actioninfo/orderlist?shopID=1&key=KPsKeutBQVGJuXPHT5u
 Parameters
 mobile, session
 
+{
+    "status": true,
+    "message": "2 order were found",
+    "data": [
+        {
+            "oid": "eff56b9c-5f8c-ded9-028d-10f18f3471a5",
+            "orderid": "136",
+            "shopID": "1",
+            "cid": "141",
+            "randchr": "311444",
+            "o_uid": "eff56b9c-5f8c-ded9-028d-10f18f3471a5",
+            "user_id": "1",
+            "products": null,
+            "date": "2021-04-29 22:00:59",
+            "referrer": null,
+            "clean_referrer": null,
+            "payment_type": "Cash on Delivery",
+            "paypal_status": null,
+            "processed": "0",
+            "viewed": "0",
+            "confirmed": "0",
+            "discount_code": null,
+            "delivereydate": "2021-04-29",
+            "deliverytime": "07:00 AM - 11:00 AM",
+            "deliverycharge": null,
+            "eqd": null,
+            "ordervalue": "354",
+            "ordervalue_shop": "0",
+            "ordervalue_cash": null,
+            "specialinstruction": "",
+            "ostatus": "N",
+            "pmtstatus": "N",
+            "first_name": "abc",
+            "last_name": "",
+            "email": null,
+            "phone": "9999999999",
+            "landmark": "sai dham",
+            "address": "borivali ",
+            "city": "mumbai",
+            "post_code": "400101",
+            "notes": "",
+            "discount_type": null,
+            "discount_amount": null
+        },
+        {
+            "oid": "f0f8bd62-90a5-11eb-8412-ee500252f38c",
+            "orderid": "70",
+            "shopID": "1",
+            "cid": "70",
+            "randchr": "808830",
+            "o_uid": "f0f8bd62-90a5-11eb-8412-ee500252f38c",
+            "user_id": null,
+            "products": null,
+            "date": "2021-03-16 11:45:27",
+            "referrer": "-",
+            "clean_referrer": "-",
+            "payment_type": "Paytm",
+            "paypal_status": null,
+            "processed": "10",
+            "viewed": "1",
+            "confirmed": "0",
+            "discount_code": null,
+            "delivereydate": null,
+            "deliverytime": null,
+            "deliverycharge": null,
+            "eqd": null,
+            "ordervalue": "343",
+            "ordervalue_shop": null,
+            "ordervalue_cash": null,
+            "specialinstruction": "",
+            "ostatus": "N",
+            "pmtstatus": "N",
+            "first_name": "Pritam Parab",
+            "last_name": null,
+            "email": null,
+            "phone": "9769344541",
+            "landmark": "sai dham",
+            "address": "borivali ",
+            "city": null,
+            "post_code": "400101",
+            "notes": "",
+            "discount_type": null,
+            "discount_amount": null
+        }
+    ]
+}
 -------------------------------------------------------------------------------------------------
-
+[13]
 Order Details - POST
 
 http://localhost/shop3/api/actioninfo/orderdetails?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 
 Parameters
 mobile, session, orderid
--------------------------------------------------------------------------------------------------
 
+{
+    "status": true,
+    "message": "3 product were found",
+    "data": {
+        "info": {
+            "date": "2021-03-16 11:45:27",
+            "o_uid": "f0f8bd62-90a5-11eb-8412-ee500252f38c",
+            "orderid": "70",
+            "first_name": "Pritam Parab",
+            "email": null,
+            "phone": "9769344541",
+            "landmark": "sai dham",
+            "address": "borivali ",
+            "city": null,
+            "post_code": "400101",
+            "ordervalue": "343",
+            "ostatus": "N",
+            "pmtstatus": "N",
+            "specialinstruction": "",
+            "payment_type": "Paytm"
+        },
+        "order": [
+            {
+                "orderid": "70",
+                "p_uid": "f0f798c6-90a5-11eb-8412-ee500252f38c",
+                "title": "Banana(केला) <br>1 KG",
+                "qty": "1",
+                "oprice": "28",
+                "qty_delivered": "0",
+                "oprice_final": "28",
+                "odstatus": "N",
+                "image": "https://inshop.s3.amazonaws.com/1/banana1.png"
+            },
+            {
+                "orderid": "70",
+                "p_uid": "f0f7b2f9-90a5-11eb-8412-ee500252f38c",
+                "title": "Brinja (बैंगन)  <br>250 GM",
+                "qty": "3",
+                "oprice": "15",
+                "qty_delivered": "0",
+                "oprice_final": "15",
+                "odstatus": "N",
+                "image": "https://inshop.s3.amazonaws.com/1/Brinjal.png"
+            },
+            {
+                "orderid": "70",
+                "p_uid": "f0f7c8a2-90a5-11eb-8412-ee500252f38c",
+                "title": "Kovakkai (Tondii) <br>250 GM",
+                "qty": "6",
+                "oprice": "45",
+                "qty_delivered": "0",
+                "oprice_final": "45",
+                "odstatus": "N",
+                "image": "https://inshop.s3.amazonaws.com/1/Kovakkai.png"
+            }
+        ]
+    }
+}
+-------------------------------------------------------------------------------------------------
+[14]
 Address List - POST
 
 http://localhost/shop3/api/actioninfo/addresslist?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 
 Parameters
 mobile, session
--------------------------------------------------------------------------------------------------
 
+{
+    "status": true,
+    "session": "64e8e6d98c91a909ed279e405cc1a4ef",
+    "message": "address list",
+    "data": [
+        {
+            "cadd_id": "86",
+            "datec": "0000-00-00 00:00:00",
+            "shopID": "1",
+            "client_id": "83",
+            "address": "flat-1402, abc CHS, deviapada, borivali E",
+            "landmark": "opposite shankar mandir",
+            "state": "",
+            "city": "Mumbai",
+            "pincode": "400066",
+            "contactperson": "Pritam Parab",
+            "contactno": "9999989999",
+            "knownas": null
+        }
+    ]
+}
+-------------------------------------------------------------------------------------------------
+[15]
 Address Add - POST
 
 http://localhost/shop3/api/actioninfo/addressadd?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
@@ -108,7 +291,7 @@ http://localhost/shop3/api/actioninfo/addressadd?shopID=1&key=KPsKeutBQVGJuXPHT5
 Parameters
 mobile, session, contactperson, contactno, address, landmark, state, city, pincode
 -------------------------------------------------------------------------------------------------
-
+[16]
 Address Delete - POST (after confirmation)
 
 http://localhost/shop3/api/actioninfo/addressdel?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
@@ -116,7 +299,7 @@ http://localhost/shop3/api/actioninfo/addressdel?shopID=1&key=KPsKeutBQVGJuXPHT5
 Parameters
 mobile, session, id (cadd_id)
 -------------------------------------------------------------------------------------------------
-
+[17]
 Address Update - POST
 
 http://localhost/shop3/api/actioninfo/addressupdate?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
@@ -124,7 +307,7 @@ http://localhost/shop3/api/actioninfo/addressupdate?shopID=1&key=KPsKeutBQVGJuXP
 Parameters
 mobile, session, contactperson, contactno, address, landmark, state, city, pincode
 -------------------------------------------------------------------------------------------------
-
+[18]
 Pincode check - POST
 http://localhost/shop3/api/actioninfo/pincheck?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 
@@ -132,7 +315,7 @@ Parameters
 mobile, session, pincode
 
 -------------------------------------------------------------------------------------------------
-
+[19]
 Discount Coupon Check - POST
 http://localhost/shop3/api/actioninfo/couponcheck?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 
@@ -140,6 +323,11 @@ Parameters
 mobile, session,
 
 ----------------------------------------------------------------------
+20) State List
+http://localhost/shop3/api/actioninfo/statelist/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+
+----------------------------------------------------------------------
+[22,23,24]
 In banner type ban_type is external
 show the page like About us
 
@@ -151,7 +339,6 @@ if ban_type is product
 
 if ban_type is banner
   call http://localhost/shop3/api/products/bannerdetails
-
 
 22) Category wise link - POST
 
@@ -167,3 +354,18 @@ parameter - id
 24) Banner wise link - POST
 http://localhost/shop3/api/products/bannerdetails/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
 parameter - id
+
+
+---------------------------------------------------------------------------------
+
+[25]
+
+Delivery List - POST
+
+http://localhost/shop3/api/actioninfo/delivery/?shopID=1&key=KPsKeutBQVGJuXPHT5uE7Nng7Nz28tGGy853vBV6urUGg7FWEa
+parameter - date, products - (JSON - pid, qty, price)
+
+&date=2021-04-25
+
+
+
